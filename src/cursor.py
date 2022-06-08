@@ -12,11 +12,11 @@ class Cursor:
 
     def __init__(self, **kwargs):
         if not kwargs:
-            self.__refresh()
+            self.refresh()
         self.x = kwargs.get('x', 0)
         self.y = kwargs.get('y', 0)
 
-    def __refresh(self) -> None:
+    def refresh(self) -> None:
         """
             Refresh the cursor position
             
@@ -31,6 +31,42 @@ class Cursor:
         """
         self.x, self.y = api.GetCursorPos()
     
+    def get_position(self) -> tuple:
+        """
+            Get the cursor position
+
+            Params:
+                None
+
+            Returns:
+                tuple: Cursor position
+
+            Raises:
+                None
+        """
+        return self.x, self.y
+
+    def button_pressed(self) -> int:
+        """
+            Get the mouse button that was clicked
+
+            Params:
+                None
+
+            Returns:
+                int: Mouse button that was clicked
+                    1: Left
+                    2: Right
+                    3: Middle
+
+            Raises:
+                None
+        """
+        for button in [1, 2]:
+            if api.GetAsyncKeyState(button) & 0x8000:
+                return button
+        return 0
+
     def click(self, button: int = 1) -> None:
         """
             Click the mouse

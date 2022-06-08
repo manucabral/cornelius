@@ -68,12 +68,13 @@ class Keyboard:
             api.keybd_event(KeyboardEvent.KEY[char], 0, 0, 0)
             api.keybd_event(KeyboardEvent.KEY[char], 0, KeyboardEvent.KEYUP, 0)
     
-    def key_state(self, key: int) -> bool:
+    def key_state(self, **kwargs) -> bool:
         """
             Get the state of a key
  
             Params:
-                None
+                key (str): Key to check
+                exclude (list): Keys to exclude when checking
  
             Returns:
                 bool: True if the key is pressed, False otherwise
@@ -81,8 +82,9 @@ class Keyboard:
             Raises:
                 None
         """
+        key = kwargs.get('key', None)
+        exclude = kwargs.get('exclude', None)
         if not key:
             return False
-        if not isinstance(key, int):
-            return False
-        return api.GetAsyncKeyState(key) & 0x8000
+        keyid = KeyboardEvent.KEY[key.upper()]
+        return api.GetAsyncKeyState(keyid) & 0x8000
