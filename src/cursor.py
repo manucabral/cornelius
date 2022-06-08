@@ -33,7 +33,7 @@ class Cursor:
     
     def get_position(self) -> tuple:
         """
-            Get the cursor position
+            Get the current cursor position
 
             Params:
                 None
@@ -44,6 +44,7 @@ class Cursor:
             Raises:
                 None
         """
+        self.refresh()
         return self.x, self.y
 
     def button_pressed(self) -> int:
