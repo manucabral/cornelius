@@ -1,4 +1,4 @@
-from cornelius import Cursor, MouseEvent
+from cornelius import Cursor
 from time import time, sleep
 
 """
