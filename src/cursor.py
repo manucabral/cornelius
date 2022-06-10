@@ -1,5 +1,5 @@
 from ctypes import windll, wintypes, byref
-from exceptions import InvalidButtonException
+from .exceptions import InvalidButtonException
 
 """
     Cornelius cursor implementation for Windows.
