@@ -29,5 +29,11 @@ keyboard.release('a')
 
 You can see more examples [here](https://github.com/manucabral/cornelius/tree/main/examples)
 
+## Planned features
+- Mouse scrolling
+- Detect multiple clicks
+- Wait for a key/mouse input
+- Rewrite modules using SendInput function
+
 ## Limitations
-Currently cornelius uses the win32 functions so does not work in some applications or video games.
+Currently cornelius uses the win32 events functions so does not work in some applications or video games.
