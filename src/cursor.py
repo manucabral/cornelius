@@ -1,111 +1,95 @@
+from ctypes import windll, Structure, c_long, byref
+from .exceptions import InvalidButtonException
+
 """
-    Cornelius cursor module.
-    This module contains the Cursor class.
+    Cornelius cursor implementation for Windows.
+    Based on the windows API and ctypes.
+    Docstrings format is reStructuredText.
+    Copyright (C) 2022 Manuel Cabral
+    Licensed under the GNU General Public License v3.0
 """
 
-import win32api as api
 
-from .constants import MouseEvent
-from .exceptions import InvalidMouseButton
+class POINT(Structure):
+    # https://docs.microsoft.com/en-us/windows/win32/api/windef/ns-windef-point
+    _fields_ = [("x", c_long), ("y", c_long)]
+
 
 class Cursor:
+    __set = windll.user32.SetCursorPos
+    __get = windll.user32.GetCursorPos
+    __event = windll.user32.mouse_event
+    __state = windll.user32.GetKeyState
 
-    def __init__(self, **kwargs):
-        if not kwargs:
-            self.refresh()
-        self.x = kwargs.get('x', 0)
-        self.y = kwargs.get('y', 0)
+    __dwFlags = {
+        1: [0x2, 0x4],  # [Left down, Left up]
+        2: [0x8, 0x10],  # [Right down, Right up]
+    }
 
-    def refresh(self) -> None:
+    RIGHT_BUTTON = 0x1
+    LEFT_BUTTON = 0x2
+
+    def __check_button(self, button) -> None:
         """
-            Refresh the cursor position
-            
-            Params:
-                None
+            Check if the button is valid.
 
-            Returns:
-                None
-
-            Raises:
-                None
+            :param button: button to check
+            :return: None
+            :raises InvalidButtonException: if button is not int or not valid
         """
-        self.x, self.y = api.GetCursorPos()
-    
-    def get_position(self) -> tuple:
+        if not isinstance(button, int):
+            raise InvalidButtonException('button must be int')
+        if not button in self.__dwFlags:
+            raise InvalidButtonException(
+                f'button must be one of {self.__dwFlags}')
+
+    def set(self, pos_x: int, pos_y: int) -> None:
         """
-            Get the current cursor position
+            Set the cursor position.
 
-            Params:
-                None
-
-            Returns:
-                tuple: Cursor position
-
-            Raises:
-                None
+            :param pos_x: x position
+            :param pos_y: y position
+            :return: None
+            :raises TypeError: if pos_x or pos_y is not int
         """
-        self.refresh()
-        return self.x, self.y
+        if not isinstance(pos_x, int) or not isinstance(pos_y, int):
+            raise TypeError("x and y must be int")
+        self.__set(pos_x, pos_y)
 
-    def button_pressed(self) -> int:
+    def get(self) -> (int, int):
         """
-            Get the mouse button that was clicked
+            Get the cursor position.
 
-            Params:
-                None
-
-            Returns:
-                int: Mouse button that was clicked
-                    1: Left
-                    2: Right
-                    3: Middle
-
-            Raises:
-                None
+            :return: (x, y)
         """
-        for button in [1, 2]:
-            if api.GetAsyncKeyState(button) & 0x8000:
-                return button
-        return 0
+        point = POINT()
+        if self.__get(byref(point)):
+            return point.x, point.y
+        return 0, 0
 
-    def click(self, button: int = 1) -> None:
+    def press(self, button: int, **kwargs) -> None:
         """
-            Click the mouse
+            Press a button.
 
-            Params:
-                button (int): Mouse button to click
-                    1: Left
-                    2: Right
-                    3: Middle
-
-            Returns:
-                None
-
-            Raises:
-                InvalidMouseButton (Exception): If the button is not valid
+            :param button: button to press
+            :param kwargs:
+                - repeat: number of times to press
+            :return: None
+            :raises InvalidButtonException: if button is not int or not valid
         """
-        if not button:
-            return
-        if not button in MouseEvent.CLICK:
-            raise InvalidMouseButton(button)
-        api.mouse_event(MouseEvent.CLICK[button][0], 0, 0)
-        api.mouse_event(MouseEvent.CLICK[button][1], 0, 0)
+        self.__check_button(button)
+        repeat = kwargs.get("repeat", 1)
+        for _ in range(repeat):
+            self.__event(self.__dwFlags[button][0], 0, 0, 0, 0)
+            self.__event(self.__dwFlags[button][1], 0, 0, 0, 0)
 
-    def move(self, **kwargs) -> None:
+    def is_pressed(self, button: int) -> bool:
         """
-            Move the cursor to the specified position
+            Check if a button is pressed.
 
-            Params:
-                x (int): X coordinate
-                y (int): Y coordinate
-
-            Returns:
-                None
-
-            Raises:
-                None
+            :param button: button to check
+            :return: True if pressed, False otherwise
+            :raises InvalidButtonException: if button is not int or not valid
         """
-        if not kwargs:
-            return
-        position = kwargs.get('x', self.x), kwargs.get('y', self.y)
-        api.SetCursorPos(position)
+        self.__check_button(button)
+        return self.__state(button) & 0x80 == 0x80
