@@ -4,7 +4,11 @@ Cornelius allows you to control mouse and keyboard inputs in a simple way.
 Currently only supports **Windows**.
 
 ## Usage
-Clone the repository
+Install the [PyPI package](https://pypi.org/project/cornelius/)
+```bash
+pip install cornelius
+```
+or clone the repository
 ```bash
 git clone https://github.com/manucabral/cornelius.git
 ```
