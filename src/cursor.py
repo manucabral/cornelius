@@ -1,5 +1,5 @@
-from ctypes import windll, Structure, c_long, byref
-from .exceptions import InvalidButtonException
+from ctypes import windll, wintypes, byref
+from exceptions import InvalidButtonException
 
 """
     Cornelius cursor implementation for Windows.
@@ -8,11 +8,6 @@ from .exceptions import InvalidButtonException
     Copyright (C) 2022 Manuel Cabral
     Licensed under the GNU General Public License v3.0
 """
-
-
-class POINT(Structure):
-    # https://docs.microsoft.com/en-us/windows/win32/api/windef/ns-windef-point
-    _fields_ = [("x", c_long), ("y", c_long)]
 
 
 class Cursor:
@@ -62,9 +57,9 @@ class Cursor:
 
             :return: (x, y)
         """
-        point = POINT()
+        point = wintypes.POINT()
         if self.__get(byref(point)):
-            return point.x, point.y
+            return point.x, point.y, point
         return 0, 0
 
     def press(self, button: int, **kwargs) -> None:
