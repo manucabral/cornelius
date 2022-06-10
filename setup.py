@@ -5,7 +5,7 @@ with open('README.md', 'r') as file:
 
 setup(
     name='cornelius',
-    version='0.0.1',
+    version='0.0.2',
     license='GPLv3',
     description='Python mouse and keyboard input control in a simple way.',
     long_description=long_description,
@@ -14,7 +14,7 @@ setup(
     author_email='cabral.manuel@yandex.com',
     url='https://github.com/manucabral/cornelius',
     keywords=['mouseinput', 'keyboardinput', 'input', 'win32', 'inputcontrol'],
-    packages=find_packages(),
+    packages=['cornelius'],
     python_requires='>= 3.2',
     classifiers=[
         'Intended Audience :: Developers',
