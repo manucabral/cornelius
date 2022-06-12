@@ -1,4 +1,8 @@
-from ctypes import windll, wintypes, byref
+from ctypes import windll, wintypes, byref, pointer, sizeof
+from ctypes.wintypes import DWORD
+from time import sleep
+
+from .structs import MouseInput, Input, _INPUTunion
 from .exceptions import InvalidButtonException
 
 """
@@ -11,9 +15,10 @@ from .exceptions import InvalidButtonException
 
 
 class Cursor:
+
+    __SendInput = windll.user32.SendInput
     __set = windll.user32.SetCursorPos
     __get = windll.user32.GetCursorPos
-    __event = windll.user32.mouse_event
     __state = windll.user32.GetKeyState
 
     __dwFlags = {
@@ -21,8 +26,8 @@ class Cursor:
         2: [0x8, 0x10],  # [Right down, Right up]
     }
 
-    RIGHT_BUTTON = 0x1
-    LEFT_BUTTON = 0x2
+    LEFT_BUTTON = 0x0001
+    RIGHT_BUTTON = 0x0002
 
     def __check_button(self, button) -> None:
         """
@@ -37,6 +42,17 @@ class Cursor:
         if not button in self.__dwFlags:
             raise InvalidButtonException(
                 f'button must be one of {self.__dwFlags}')
+
+    def is_pressed(self, button: int) -> bool:
+        """
+            Check if a button is pressed.
+
+            :param button: button to check
+            :return: True if pressed, False otherwise
+            :raises InvalidButtonException: if button is not int or not valid
+        """
+        self.__check_button(button)
+        return self.__state(self.__dwFlags[button][0]) & 0x8000
 
     def set(self, pos_x: int, pos_y: int) -> None:
         """
@@ -62,29 +78,57 @@ class Cursor:
             return point.x, point.y, point
         return 0, 0
 
-    def press(self, button: int, **kwargs) -> None:
+    def press(self, button: int) -> int:
         """
             Press a button.
 
             :param button: button to press
-            :param kwargs:
-                - repeat: number of times to press
+            :return: number of events sent
+        """
+        x, y, _ = self.get()
+        extra_flags = pointer(DWORD(0))
+        union = _INPUTunion()
+        union.mi = MouseInput(
+            x, y, button, self.__dwFlags[button][0], 0, extra_flags)
+        input_ = Input(0, union)
+        events = self.__SendInput(1, pointer(input_), sizeof(input_))
+        return events
+
+    def release(self, button: int) -> int:
+        """
+            Release a button.
+
+            :param button: button to release
+            :return: number of events sent
+        """
+        self.__check_button(button)
+        x, y, _ = self.get()
+        extra_flags = pointer(DWORD(0))
+        union = _INPUTunion()
+        union.mi = MouseInput(
+            x, y, button, self.__dwFlags[button][1], 0, extra_flags)
+        input_ = Input(0, union)
+        events = self.__SendInput(1, pointer(input_), sizeof(input_))
+        return events
+
+    def left_click(self, delay: float = 0.1) -> None:
+        """
+            Send a left click.
+
+            :param delay: delay between clicks
+            :return: Nones
+        """
+        self.press(self.LEFT_BUTTON)
+        sleep(delay)
+        self.release(self.LEFT_BUTTON)
+
+    def right_click(self, delay: float = 0.1) -> None:
+        """
+            Sends a right click.
+
+            :param delay: delay between clicks
             :return: None
-            :raises InvalidButtonException: if button is not int or not valid
         """
-        self.__check_button(button)
-        repeat = kwargs.get("repeat", 1)
-        for _ in range(repeat):
-            self.__event(self.__dwFlags[button][0], 0, 0, 0, 0)
-            self.__event(self.__dwFlags[button][1], 0, 0, 0, 0)
-
-    def is_pressed(self, button: int) -> bool:
-        """
-            Check if a button is pressed.
-
-            :param button: button to check
-            :return: True if pressed, False otherwise
-            :raises InvalidButtonException: if button is not int or not valid
-        """
-        self.__check_button(button)
-        return self.__state(button) & 0x80 == 0x80
+        self.press(self.RIGHT_BUTTON)
+        sleep(delay)
+        self.release(self.RIGHT_BUTTON)
