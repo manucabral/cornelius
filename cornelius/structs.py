@@ -1,5 +1,5 @@
-from ctypes import pointer, sizeof, Union, Structure
-from ctypes.wintypes import WORD, DWORD, LONG, ULONG, PULONG, LPDWORD
+from ctypes import Union, Structure
+from ctypes.wintypes import WORD, DWORD, LONG, PULONG
 
 """
     Cornelius C windows structures implementation.
