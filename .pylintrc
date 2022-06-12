@@ -2,5 +2,6 @@
 disable=
     C0114, # missing-module-docstring
     C0115, # missing-class-docstring
+    C0103, # invalid-name (structs.py)
     W0105, # string statement has no effect
     R0903, # too few public methods
