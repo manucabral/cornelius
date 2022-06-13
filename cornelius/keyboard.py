@@ -103,7 +103,7 @@ class Keyboard:
             :return: The number of events sent.
             :raises InvalidKeyException: if the key is not a valid key.
         """
-        key = self.__convert_key(key, 'scan')
+        key = self.__convert_key(key.lower(), 'scan')
         extra_flags = pointer(DWORD(0))
         union = _INPUTunion()
         union.ki = KeyboardInput(0, key, 0x0008, 0, extra_flags)
@@ -119,7 +119,7 @@ class Keyboard:
             :return: The number of events sent.
             :raises InvalidKeyException: if the key is not a valid key.
         """
-        key = self.__convert_key(key, 'scan')
+        key = self.__convert_key(key.lower(), 'scan')
         extra_flags = pointer(DWORD(0))
         union = _INPUTunion()
         union.ki = KeyboardInput(0, key, 0x0008 | 0x0002, 0, extra_flags)
@@ -151,5 +151,5 @@ class Keyboard:
             :return: True if the key is pressed, False otherwise.
             :raises InvalidKeyException: if the key is not a valid key.
         """
-        key = self.__convert_key(key, 'vk')
+        key = self.__convert_key(key.lower(), 'vk')
         return self.__state(key) & 0x80 == 0x80
