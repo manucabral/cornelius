@@ -25,6 +25,6 @@ print('Recorded successfully!')
 print('Executing recorded sequence')
 
 for position in positions:
-    x, y = position
+    x, y, _ = position  # _ is the pointer, we don't need it!
     mouse.set(x, y)
     sleep(velocity)

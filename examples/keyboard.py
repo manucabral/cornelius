@@ -1,4 +1,9 @@
 from cornelius import Keyboard
+from time import sleep
 
 kb = Keyboard()
-kb.press('a')
+text = 'hello'
+
+for c in text:
+    kb.press(c)
+    sleep(0.1)
