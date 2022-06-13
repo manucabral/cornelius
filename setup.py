@@ -5,7 +5,7 @@ with open('README.md', 'r') as file:
 
 setup(
     name='cornelius',
-    version='0.0.2',
+    version='0.0.3',
     license='GPLv3',
     description='Python mouse and keyboard input control in a simple way.',
     long_description=long_description,
