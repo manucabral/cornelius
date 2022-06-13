@@ -4,6 +4,7 @@ Cornelius allows you to control mouse and keyboard inputs in a simple way.
 
 Currently only supports **Windows**.
 
+See full documentation [here](https://github.com/manucabral/cornelius/wiki)
 ## Usage
 
 Install the [PyPI package](https://pypi.org/project/cornelius/)
@@ -27,7 +28,7 @@ from cornelius import Cursor
 
 mouse = Cursor()
 mouse.set(500, 500)
-mouse.press(1) # left click
+mouse.left_click()
 ```
 
 Using keyboard module
