@@ -77,7 +77,8 @@ class Keyboard:
         'f9': {'vk': 0x78, 'scan': 0x43},
         'f10': {'vk': 0x79, 'scan': 0x44},
         'f11': {'vk': 0x7A, 'scan': 0x57},
-        'f12': {'vk': 0x7B, 'scan': 0x58}
+        'f12': {'vk': 0x7B, 'scan': 0x58},
+        '-': {'vk': 0xBD, 'scan': 0x1A},
     }
 
     def __convert_key(self, key: str, outformat: str) -> int:
