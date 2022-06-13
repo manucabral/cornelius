@@ -21,6 +21,7 @@ class Cursor:
     __get = windll.user32.GetCursorPos
     __state = windll.user32.GetKeyState
 
+    # Mouse flags, only for left and right button.
     __dwFlags = {
         1: [0x2, 0x4],  # [Left down, Left up]
         2: [0x8, 0x10],  # [Right down, Right up]
