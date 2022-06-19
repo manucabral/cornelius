@@ -136,7 +136,6 @@ class Keyboard:
             :return: The number of events sent.
             :raises InvalidKeyException: if the key is not a valid key.
         """
-        key = self.__convert_key(key, 'scan')
         events = 0 + self.press(key)
         if delay > 0.0:
             sleep(delay)
